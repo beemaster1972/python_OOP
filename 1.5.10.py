@@ -44,7 +44,7 @@ class GamePole:
         for i in range(self.dimension):
             for j in range(self.dimension):
                 # cell = self.pole[i][j].around_mines if self.pole[i][j].fl_open else '#'
-                cell = '#' if self.pole[i][j].mine else self.pole[i][j].mines_around
+                cell = '*' if self.pole[i][j].mine else self.pole[i][j].around_mines
 
                 print(cell, end=' ')
             print()
