@@ -17,8 +17,7 @@ class Dialog:
             return super().__new__(DialogWindows)
         return super().__new__(DialogLinux)
 
-    def __init__(self, name):
-        self.name = name
+
 
 
 dlg = Dialog('Windows')
