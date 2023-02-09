@@ -14,8 +14,11 @@ class Dialog:
 
     def __new__(cls, *args, **kwargs):
         if TYPE_OS == 1:
-            return super().__new__(DialogWindows)
-        return super().__new__(DialogLinux)
+            dw = super().__new__(DialogWindows)
+        else:
+            dw = super().__new__(DialogLinux)
+        setattr(dw, 'name', args[0])
+        return dw
 
 
 
