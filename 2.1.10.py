@@ -30,7 +30,7 @@ class EmailValidator:
         eml = email.split('@')
 
         return email.count('@') == 1 and len(eml[0]) <= 100 and len(eml[1]) <= 50 and eml[1].count('.') >= 1 \
-               and cls.chek_dots_in_domain(email) and set(email)  set(cls.VALID_CHARS)
+               and cls.chek_dots_in_domain(email) and set(email) & set(cls.VALID_CHARS) == set(email)
 
     @classmethod
     def get_random_email(cls, domain="@gmail.com"):
