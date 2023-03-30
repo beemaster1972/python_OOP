@@ -24,4 +24,26 @@ class StackObj:
 class Stack:
 
     def __init__(self):
-        self.__top = None
+        self.top = None
+
+    def __get_last_obj(self):
+        cur_obj = self.top
+        while cur_obj.next:
+            cur_obj = cur_obj.next
+        return cur_obj
+
+    def push(self, obj):
+        if type(obj) is not StackObj:
+            return None
+        if not self.top:
+            self.top = obj
+        else:
+            last_obj = self.__get_last_obj()
+            last_obj.next = obj
+
+    def pop(self):
+        last_obj = self.__get_last_obj()
+        
+
+
+
