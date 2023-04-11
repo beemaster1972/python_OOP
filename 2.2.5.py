@@ -8,7 +8,7 @@ class WindowDlg:
     @staticmethod
     def check_dimensions(*args, **kwargs):
         width, height = args[:2]
-        return all((type(width) == int, type(height) == int, 0 <= width <=10000, 0 <= height <= 10000))
+        return all((type(width) == int, type(height) == int, 0 <= width <= 10000, 0 <= height <= 10000))
 
     @property
     def width(self):
