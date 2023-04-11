@@ -24,4 +24,4 @@ class StackObj:
 class Stack:
 
     def __init__(self):
-        self.__top = None
+        self.top = None
