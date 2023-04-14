@@ -18,7 +18,7 @@ class StackObj:
 
     @next.setter
     def next(self, next):
-        if type(next) in (StackObj, None):
+        if type(next) in (StackObj, type(None)):
             self.__next = next
 
 
@@ -29,10 +29,10 @@ class Stack:
 
     def __get_last_obj(self):
         cur_obj = self.top
-        prev_obj = cur_obj
+        prev_obj = None
         while cur_obj.next:
-            cur_obj = cur_obj.next
             prev_obj = cur_obj
+            cur_obj = cur_obj.next
         return cur_obj, prev_obj
 
     def push(self, obj):
@@ -46,7 +46,10 @@ class Stack:
 
     def pop(self):
         last_obj, prev_obj = self.__get_last_obj()
-        prev_obj.next = None
+        if last_obj is self.top:
+            self.top = None
+        if isinstance(prev_obj, StackObj):
+            prev_obj.next = None
         return last_obj
 
     def get_data(self):
