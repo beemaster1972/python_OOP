@@ -9,7 +9,7 @@ class LineTo:
     def start(self):
         return self.__start
 
-    @top.setter
+    @start.setter
     def start(self, start):
         self.__start = start
 
@@ -31,7 +31,7 @@ class LineTo:
 
 
 class PathLines:
-    
+
     def __init__(self, *args):
         pass
 
