@@ -3,15 +3,15 @@ class LineTo:
     def __init__(self, x=0, y=0):
         self.__x = x
         self.__y = y
-        self.__top = None
+        self.__start = None
 
     @property
-    def top(self):
-        return self.__top
+    def start(self):
+        return self.__start
 
     @top.setter
-    def top(self, top):
-        self.__top = top
+    def start(self, start):
+        self.__start = start
 
     @property
     def x(self):
@@ -31,8 +31,7 @@ class LineTo:
 
 
 class PathLines:
-    TOP = (0, 0)
-
+    
     def __init__(self, *args):
         pass
 
@@ -50,4 +49,3 @@ class PathLines:
     @staticmethod
     def __get_line_length(x0, y0, x1, y1):
         return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** (1/2)
-    
