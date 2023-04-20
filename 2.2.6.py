@@ -43,7 +43,7 @@ class Stack:
 
     def pop(self):
         last_obj = self.__get_last_obj()
-        
+
 
 
 
