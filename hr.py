@@ -1,6 +1,67 @@
-from calendar import weekday
-answer = list(map(int, input().split()))
-print(["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][weekday(answer[2],answer[0],answer[1])].upper())
+
+
+# import numpy as np
+#
+# if __name__ == '__main__':
+#     A = list(map(int, input().split()))
+#     B = list(map(int, input().split()))
+#     print(np.inner(A, B))
+#     print(np.outer(A, B), sep='\n')
+
+# if __name__ == '__main__':
+#     n = int(input())
+#     student_marks = {}
+#     for _ in range(n):
+#         name, *line = input().split()
+#         scores = list(map(float, line))
+#         student_marks[name] = scores
+#     query_name = input()
+#     print(f'{sum(student_marks[query_name])/len(student_marks[query_name]):.2f}')
+
+
+# def stud_key(lst):
+#     return lst[1]
+#
+#
+# if __name__ == '__main__':
+#     studs = {}
+#     for _ in range(int(input())):
+#         name = input()
+#         score = float(input())
+#         try:
+#             studs[score].append(name)
+#         except:
+#             studs[score] = [name]
+#     scores = sorted([score for score in studs.keys()])
+#     print(*sorted(studs[scores[1]]), sep='\n')
+
+
+# if __name__ == '__main__':
+#     n = int(input())
+#     arr = map(int, input().split())
+#     print(sorted(set(arr))[-2])
+
+# from itertools import permutations, product
+#
+#
+# if __name__ == '__main__':
+#     x = int(input())
+#     y = int(input())
+#     z = int(input())
+#     n = int(input())
+#
+#     lst_x = [i for i in range(0, x+1)]
+#     lst_y = [j for j in range(0, y+1)]
+#     lst_z = [k for k in range(0, z+1)]
+#     coords = [coord for coord in product(lst_x, lst_y, lst_z) if sum(coord) != n]
+#    # coords = [coord for coord in permutations([lst_x, lst_y, lst_z],3)]# if sum(coord) != n]
+#
+#     print(*coords)
+
+
+# from calendar import weekday
+# answer = list(map(int, input().split()))
+# print(["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][weekday(answer[2],answer[0],answer[1])].upper())
 
 # from itertools import product
 #
