@@ -1,7 +1,7 @@
 class Value:
 
     def __set_name__(self, owner, name):
-        self.name = '__' + name
+        self.name = '_' + owner.__name__ + '__' + name
 
     def __get__(self, instance, owner):
         return instance.__dict__[self.name]
@@ -12,14 +12,20 @@ class Value:
 
 class ObjList:
 
-    __data = Value()
-    __next = Value()
-    __prev = Value()
+    data = Value()
+    next = Value()
+    prev = Value()
 
     def __init__(self, data: str):
-        self.__data = data
-        self.__prev = None
-        self.__next = None
+        self.data = data
+        self.prev = None
+        self.next = None
+
+    def __repr__(self):
+        head = self.prev.data if self.prev else '['
+        tail = self.next.data if self.next else ']'
+        res = f'{head} {self.data} {tail}'
+        return res
 
 
 class LinkedList:
@@ -49,12 +55,15 @@ class LinkedList:
         i = 0
         while i < self.len_list:
             if i == indx:
-                try:
+                if cur_obj is self.tail:
+                    self.tail = cur_obj.prev
+                    cur_obj.prev.next = None
+                elif cur_obj is self.head:
+                    cur_obj.next.prev = None
+                    self.head = cur_obj.next
+                else:
                     cur_obj.prev.next = cur_obj.next
                     cur_obj.next.prev = cur_obj.prev
-                except:
-                    self.head = cur_obj.next
-                    cur_obj.next.prev = None
                 self.len_list -= 1
                 break
             else:
