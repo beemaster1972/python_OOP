@@ -51,9 +51,16 @@ class LinkedList:
         self.len_list += 1
 
     def remove_obj(self, indx):
+        if not len(self):
+            return False
+        elif len(self) == 1:
+            self.head = None
+            self.tail = None
+            self.len_list = 0
+            return
         cur_obj = self.head
         i = 0
-        while i < self.len_list:
+        while i < self.len_list and cur_obj:
             if i == indx:
                 if cur_obj is self.tail:
                     self.tail = cur_obj.prev
@@ -111,3 +118,8 @@ while h:
     n += 1
 
 assert n == 3, "при перемещении по списку через __prev не все объекты перебрались"
+ln.remove_obj(0)
+ln.remove_obj(2)
+ln.remove_obj(1)
+ln.remove_obj(0)
+assert ln.head is None and ln.tail is None, "при удалении всех объектов ссылки head и tail должны быть равны None"
