@@ -1,4 +1,10 @@
+def count_letter(letter: str, lst: list):
+  return sum([bool(w.count(letter)) for w in lst])
 
+
+if __name__ == "__main__":
+    st = 'Learning python tonight'
+    print(count_letter('t', st.split()))
 
 # import numpy as np
 #
