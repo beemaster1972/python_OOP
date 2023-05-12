@@ -1,20 +1,39 @@
-from operator import contains
-
 class NewList:
 
     def __init__(self, *args):
         self.__list = list(*args)
 
-    def __sub__(self, other):
+    #  Определяем функцию вычитания, в зависимости от направления
+    #  если True, то self - other, иначе other - self
+    def __subtraction(self, other, direction=True):
         if not isinstance(other, (list, NewList)):
             raise ArithmeticError
         other = other if isinstance(other, list) else other.__list
-        res = [el for i, el in enumerate(self.__list) if el is not (sub_el for sub_el in other)]
+        res = []
+        #  Создаем копию вычитаемого, т.к. оригинал может понадобиться в последующих операциях
+        minuend = self.__list if direction else other
+        subtrahend = other.copy() if direction else self.__list.copy()
+        for i, el in enumerate(minuend):
+            for j, sub_el in enumerate(subtrahend):
+                flag_remove = el is sub_el
+                if flag_remove:
+                    subtrahend.pop(j)
+                    break
+            else:
+                res.append(el)
+        return res
 
+    def __sub__(self, other):
+        res = self.__subtraction(other)
         return NewList(res)
 
     def __rsub__(self, other):
-        return self - other
+        res = self.__subtraction(other, False)
+        return NewList(res)
+
+    def __isub__(self, other):
+        self.__list = self.__subtraction(other)
+        return self
 
     def get_list(self):
         return self.__list
@@ -41,5 +60,5 @@ res = lst_1 - lst_2
 assert res.get_list() == [0, 5.0, 1, True, -7.87], f"метод get_list вернул неверный список {res.get_list()}"
 
 a = NewList([2, 3])
-res_4 = [1, 2, 2, 3] - a # NewList: [1, 2]
+res_4 = [1, 2, 2, 3] - a  # NewList: [1, 2]
 assert res_4.get_list() == [1, 2], f"метод get_list вернул неверный список {res_4.get_list()}"
