@@ -1,37 +1,42 @@
-import math
-import os
-import random
-import re
-import sys
-import datetime as dt
+def create_phone_number(n):
+    return f'({"".join(n[:3])}) {"".join(n[3:6])}-{"".join(n[6:])}'
 
 
-# Complete the time_delta function below.
-# month = {'jan': (1, 31), 'feb': (2, 28), 'mar': (3, 31), 'apr': (4, 30), 'may': (5, 31), 'jun': (6, 30),
-#          'jul': (7, 31), 'aug': (8, 31), 'sep': (9, 30), 'oct': (10, 30), 'nov': (11, 30), 'dec': (12,31)}
-def time_delta(t1, t2):
-    format_str = "%a %d %b %Y %H:%M:%S %z"
-    time1 = dt.datetime.strptime(t1, format_str)
-    time2 = dt.datetime.strptime(t2, format_str)
-    res = abs(int((time1 - time2).total_seconds()))
-    return str(res)
-
-
-if __name__ == '__main__':
-    fptr = open(os.environ['OUTPUT_PATH'], 'w')
-
-    t = int(input())
-
-    for t_itr in range(t):
-        t1 = input()
-
-        t2 = input()
-
-        delta = time_delta(t1, t2)
-
-        fptr.write(delta + '\n')
-
-    fptr.close()
+print(create_phone_number([1,2,3,4,5,6,7,8,9,0]))
+# import math
+# import os
+# import random
+# import re
+# import sys
+# import datetime as dt
+#
+#
+# # Complete the time_delta function below.
+# # month = {'jan': (1, 31), 'feb': (2, 28), 'mar': (3, 31), 'apr': (4, 30), 'may': (5, 31), 'jun': (6, 30),
+# #          'jul': (7, 31), 'aug': (8, 31), 'sep': (9, 30), 'oct': (10, 30), 'nov': (11, 30), 'dec': (12,31)}
+# def time_delta(t1, t2):
+#     format_str = "%a %d %b %Y %H:%M:%S %z"
+#     time1 = dt.datetime.strptime(t1, format_str)
+#     time2 = dt.datetime.strptime(t2, format_str)
+#     res = abs(int((time1 - time2).total_seconds()))
+#     return str(res)
+#
+#
+# if __name__ == '__main__':
+#     fptr = open(os.environ['OUTPUT_PATH'], 'w')
+#
+#     t = int(input())
+#
+#     for t_itr in range(t):
+#         t1 = input()
+#
+#         t2 = input()
+#
+#         delta = time_delta(t1, t2)
+#
+#         fptr.write(delta + '\n')
+#
+#     fptr.close()
 
 # import numpy as np
 #
