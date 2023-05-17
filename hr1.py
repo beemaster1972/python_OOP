@@ -1,8 +1,22 @@
-def create_phone_number(n):
-    return f'({"".join(n[:3])}) {"".join(n[3:6])}-{"".join(n[6:])}'
+s = ''
+print(len(s), len(s.upper().lower()))
 
 
-print(create_phone_number([1,2,3,4,5,6,7,8,9,0]))
+# def validate_hello(greetings):
+#     hello = {'hello':'english', 'ciao':'italian', 'salut':'french', 'hallo':'german',
+#              'hola':'spanish', 'ahoj':'czech republic', 'czesc':'polish'}
+#     return any([key in greetings.lower() for key in hello])
+
+# print(validate_hello('Привет'))
+
+
+# def create_phone_number(n):
+#
+#     n_to_str = list(map(str, n))
+#     return f'({"".join(n_to_str[:3])}) {"".join(n_to_str[3:6])}-{"".join(n_to_str[6:10])}'
+#
+#
+# print(create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]))
 # import math
 # import os
 # import random
