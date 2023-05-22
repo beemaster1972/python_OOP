@@ -35,6 +35,7 @@ dict_words = [Morph(*re.split(delimiters, x)) for x in words_lst]
 print(*dict_words, sep='\n')
 
 text = re.split(delimiters, input())
+print(text)
 count = 0
 for __, words in enumerate(dict_words):
     count += len(list(filter(lambda x: words == x, text)))
