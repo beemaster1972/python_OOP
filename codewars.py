@@ -1,3 +1,30 @@
+def queue_time(customers, n):
+    if not len(customers):
+        return 0
+    elif len(customers) <= n:
+        return max(customers)
+    c = customers.copy()
+    res = []
+    tills = set()
+    i = 0
+    while True:
+
+        tills |= set(c[i:n-len(tills)+i])
+        if i + n >= len(customers):
+            res.append(max(tills))
+            break
+        else:
+            res.append(min(tills))
+            tills.remove(min(tills))
+        i += n
+    return sum(res)
+
+
+# print(queue_time([], 1))
+# print(queue_time([2,2,3,3,4,4], 2))
+print(queue_time([25, 41, 25, 36, 15, 45, 11, 41, 22, 13, 1, 8, 2, 40, 3, 20, 27, 18, 36, 11],3))
+
+
 def tower_builder(n_floors):
     len_n = 1+ (n_floors-1)*2
     res = []
@@ -7,7 +34,7 @@ def tower_builder(n_floors):
     return res
     # build here
 
-print(*tower_builder(4),sep='\n')
+#print(*tower_builder(4),sep='\n')
 
 
 def make_readable(seconds):
