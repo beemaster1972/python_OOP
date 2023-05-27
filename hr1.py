@@ -1,5 +1,8 @@
-s = ''
-print(len(s), len(s.upper().lower()))
+
+
+
+# s = ''
+# print(len(s), len(s.upper().lower()))
 
 
 # def validate_hello(greetings):
