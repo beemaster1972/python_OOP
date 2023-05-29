@@ -3,48 +3,144 @@ def queue_time(customers, n):
         return 0
     elif len(customers) <= n:
         return max(customers)
-    c = customers.copy()
+    elif n == 1:
+        return sum(customers)
+    c = customers
     res = []
-    tills = set()
-    i = 0
-    while True:
-
-        tills |= set(c[i:n-len(tills)+i])
-        if i + n >= len(customers):
-            res.append(max(tills))
+    window = []
+    left, right = 0, n
+    while right <= len(customers):
+        window.extend(c[left:right])
+        if right >= len(c):
+            res.append(max(window))
             break
         else:
-            res.append(min(tills))
-            tills.remove(min(tills))
-        i += n
+            min_time = min(window)
+            res.append(min_time)
+            for _ in range(window.count(min_time)): window.remove(min_time)
+            window = [x-min_time for x in window]
+        left = right
+        right = n - len(window) + left
+    print(res)
     return sum(res)
 
+# должно быть 121
+print(queue_time([47, 37, 29, 47, 11, 49, 5, 12, 34, 33, 48, 42, 49],4))
+print(queue_time([2,2,3,3,4,4], 2))
+print(queue_time([25, 41, 25, 36, 15, 45, 11, 41, 22, 13, 1, 8, 2, 40, 3, 20, 27, 18, 36, 11], 3))
+print(queue_time([9, 34, 11, 23, 36, 50, 32, 15, 35, 45, 43, 36, 44, 33, 16, 18, 48, 8],3))
 
-# print(queue_time([], 1))
-# print(queue_time([2,2,3,3,4,4], 2))
-print(queue_time([25, 41, 25, 36, 15, 45, 11, 41, 22, 13, 1, 8, 2, 40, 3, 20, 27, 18, 36, 11],3))
+
+def remov_nb(n):
+    ans = []
+    m, r = (n + 1) // 2, n + 1
+    sum_of_seq = sum(range(n + 1))
+    l = 1  # if m*r < sum_of_seq - m - r else m
+    while l < r:
+        prod = l * r
+        if prod == sum_of_seq - l - r:
+            ans.append((l, r))
+            ans.append((r, l))
+            l += 1
+            r -= 1
+        elif prod < sum_of_seq - l - r:
+            l += 1
+        else:
+            r -= 1
+    # your code
+    return sorted(ans, key=lambda x: x[0])
+
+
+# for _ in range(100_000):
+#     a = remov_nb(_)
+#     print(_, a)
+
+
+def last_digit(n1, n2):
+    exponents = {0: 4, 1: 1, 2: 2, 3: 3}
+    exponent = n2 % 4
+    base_digits = n1 % 10
+    return base_digits ** exponents[exponent] % 10
+
+
+# print(last_digit(3715290469715693021198967285016729344580685479654510946723, 68819615221552997273737174557165657483427362207517952651))
+
+
+def generate_hashtag(s: str):
+    # your code here
+    res = '#' + ''.join(map(str.capitalize, s.split()))
+    return res if len(res) <= 140 and len(s) else False
+
+
+# print(generate_hashtag('Codewars Is Nice'))
+# import time
+
+def strip_comments(strng, markers):
+    ans = strng.split('\n')
+
+    for i, strng in enumerate(ans):
+
+        res = ''
+        fl = True
+        for j, ch in enumerate(strng):
+            if ch not in markers and fl:
+                res += ch
+            else:
+                fl = False
+        ans[i] = res.strip()
+    return '\n'.join(ans)
+
+
+# print(strip_comments('apples, pears # and bananas\ngrapes\nbananas !apples', ['#', '!']))
+
+
+def format_duration(seconds):
+    if not seconds:
+        return 'now'
+    years, days = divmod(seconds, 3600 * 24 * 365)
+    days, hours = divmod(days, 3600 * 24)
+    hours, minutes = divmod(hours, 3600)
+    minutes, seconds = divmod(minutes, 60)
+    res = f'{years} {"years" if years > 1 else "year"}' if years > 0 else ''
+    res += ', ' if res and days else ''
+    res += f'{days} {"days" if days > 1 else "day"}' if days > 0 else ''
+    res += ', ' if res and hours else ''
+    res += f'{hours} {"hours" if hours > 1 else "hour"}' if hours > 0 else ''
+    res += ', ' if res and minutes else ''
+    res += f'{minutes} {"minutes" if minutes > 1 else "minute"}' if minutes > 0 else ''
+    res += ', ' if res and seconds else ''
+    res += f'{seconds} {"seconds" if seconds > 1 else "second"}' if seconds > 0 else ''
+    match = list(re.finditer(r'(, )', res))
+    if match:
+        res = res[:match[-1].regs[1][0]] + ' and ' + res[match[-1].regs[1][1]:]
+    return res
+
+
+# print(format_duration(2075562))
 
 
 def tower_builder(n_floors):
-    len_n = 1+ (n_floors-1)*2
+    len_n = 1 + (n_floors - 1) * 2
     res = []
-    for i in range(1,n_floors+1):
-      st = ' '*((len_n -(1+(i-1)*2))//2)+'*'*(1+(i-1)*2)+' '*((len_n -(1+(i-1)*2))//2)
-      res.append(st)
+    for i in range(1, n_floors + 1):
+        st = ' ' * ((len_n - (1 + (i - 1) * 2)) // 2) + '*' * (1 + (i - 1) * 2) + ' ' * (
+                (len_n - (1 + (i - 1) * 2)) // 2)
+        res.append(st)
     return res
     # build here
 
-#print(*tower_builder(4),sep='\n')
+
+# print(*tower_builder(4),sep='\n')
 
 
 def make_readable(seconds):
-  h, m = divmod(seconds, 3600)
-  m, s = divmod(m, 60)
-  return f'{h:02}:{m:02}:{s:02}'
+    h, m = divmod(seconds, 3600)
+    m, s = divmod(m, 60)
+    return f'{h:02}:{m:02}:{s:02}'
 
 
 def array_diff(a, b):
-    #your code here
+    # your code here
     set_a, set_b = set(a), set(b)
     set_c = set_a - set_b
     return [x for x in a if x in set_c]
@@ -86,7 +182,7 @@ Note: n and p will always be given as strictly positive integers.
 
 def dig_pow(n, p):
     # your code
-    k = sum([pow(int(num), p+i) for i, num in enumerate(str(n))])/n
+    k = sum([pow(int(num), p + i) for i, num in enumerate(str(n))]) / n
     return -1 if k % 1 else k
 
 
@@ -100,6 +196,7 @@ def dig_pow(n, p):
 
 def is_square(n):
     return False if n < 0 else pow(n, 1 / 2) == int(pow(n, 1 / 2))  # fix me
+
 
 # print(is_square(-1), is_square(4), is_square(1), is_square(2), is_square(3), is_square(25))
 
