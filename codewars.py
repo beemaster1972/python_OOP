@@ -1,3 +1,53 @@
+class Node:
+    def __init__(self, L, R, n):
+        self.left = L
+        self.right = R
+        self.value = n
+
+    def __repr__(self):
+        return f'{self.left.value if self.left else "None"}<-- {self.value if self else "None"} -->' \
+               f'{self.right.value if self.right else "None"}'
+
+
+def pre_order(node):
+    if node:
+        print(node.value)
+        pre_order(node.left)
+        pre_order(node.right)
+
+
+tree = Node(None, None, 1)
+tree.left = Node(None, None, 2)
+tree.right = Node(None, None, 3)
+tree.left.left = Node(None, None, 4)
+tree.left.right = Node(None, None, 5)
+
+# print(pre_order(tree))
+
+
+def level_order(node):
+    res = [node]
+    while len(res) > 0:
+        tmp = res.pop(0)
+        if tmp:
+            yield tmp.value
+            if tmp.left:
+                res.append(tmp.left)
+            if tmp.right:
+                res.append(tmp.right)
+
+def tree_by_levels(node: Node):
+
+    if not node:
+        return []
+    return [x for x in level_order(node)]
+
+# print(tree_by_levels(None))
+
+
+print(tree_by_levels(Node(Node(None, Node(None, None, 4), 2), Node(Node(None, None, 5), Node(None, None, 6), 3), 1)))
+
+
 def queue_time(customers, n):
     if not len(customers):
         return 0
@@ -9,7 +59,7 @@ def queue_time(customers, n):
     res = []
     window = []
     left, right = 0, n
-    while right <= len(customers):
+    while True:
         window.extend(c[left:right])
         if right >= len(c):
             res.append(max(window))
@@ -24,11 +74,13 @@ def queue_time(customers, n):
     print(res)
     return sum(res)
 
-# должно быть 121
-print(queue_time([47, 37, 29, 47, 11, 49, 5, 12, 34, 33, 48, 42, 49],4))
-print(queue_time([2,2,3,3,4,4], 2))
-print(queue_time([25, 41, 25, 36, 15, 45, 11, 41, 22, 13, 1, 8, 2, 40, 3, 20, 27, 18, 36, 11], 3))
-print(queue_time([9, 34, 11, 23, 36, 50, 32, 15, 35, 45, 43, 36, 44, 33, 16, 18, 48, 8],3))
+# must be 101
+# print(queue_time([41, 21, 28, 29, 8, 37, 13, 2, 40, 37, 37, 11, 24, 36, 14, 45, 33, 40], 6))
+# # должно быть 121
+# print(queue_time([47, 37, 29, 47, 11, 49, 5, 12, 34, 33, 48, 42, 49],4))
+# print(queue_time([2,2,3,3,4,4], 2))
+# print(queue_time([25, 41, 25, 36, 15, 45, 11, 41, 22, 13, 1, 8, 2, 40, 3, 20, 27, 18, 36, 11], 3))
+# print(queue_time([9, 34, 11, 23, 36, 50, 32, 15, 35, 45, 43, 36, 44, 33, 16, 18, 48, 8],3))
 
 
 def remov_nb(n):
