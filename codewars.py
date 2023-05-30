@@ -1,3 +1,17 @@
+
+# 4 By 4 Skyscrapers
+import numpy as np
+def solve_puzzle(clues):
+    puzzle = np.zeros((4, 4), int)
+    for i, row in enumerate(puzzle):
+        for j, col in enumerate(row):
+            if clues[i]
+    return puzzle
+
+
+print(solve_puzzle((0,0)))
+
+
 class Node:
     def __init__(self, L, R, n):
         self.left = L
