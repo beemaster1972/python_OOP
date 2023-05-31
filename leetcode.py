@@ -1,5 +1,5 @@
 def min_ham_dist(source, target, allowedSwaps):
-    
+
 
 
 # Definition for singly-linked list.
