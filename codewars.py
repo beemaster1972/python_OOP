@@ -1,4 +1,6 @@
 # 4 By 4 Skyscrapers
+from typing import Sized
+
 import numpy as np
 
 N = 4
@@ -47,6 +49,8 @@ outcomes = (
 )
 
 solve = solve_puzzle(clues[0])
+max_length = max(solve, key=len)
+print(max_length)
 for _, row in enumerate(solve):
     print(*row)
 
