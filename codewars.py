@@ -1,15 +1,54 @@
-
 # 4 By 4 Skyscrapers
 import numpy as np
+
+N = 4
+
+
+def fill_base_constraint(number, puzzle):
+    constraint = puzzle[(0, number)]
+    for i in range(1, N + 1):
+        if constraint == N:
+            puzzle[(i, number)] = puzzle[(i, number)].append(str(i)) if puzzle.get((i, number), False) else [str(i)]
+        if constraint == 1:
+            puzzle[1][number] = puzzle[(1, number)].append(str(N)) if puzzle.get((1, number), False) else [str(N)]
+
+
 def solve_puzzle(clues):
-    puzzle = np.zeros((4, 4), int)
-    for i, row in enumerate(puzzle):
-        for j, col in enumerate(row):
-            if clues[i]
+    puzzle = {(i, j): None for i in range(N + 3) for j in range(N + 3)}
+    for _ in range(4):
+        for j in range(1, N + 1):
+            puzzle[(0, j)] = clues[_ + j - 1 + (N - 1) * _]
+            fill_base_constraint(j, puzzle)
+        puzzle = np.rot90(puzzle)
+
     return puzzle
 
 
-print(solve_puzzle((0,0)))
+clues = (
+    (4, 2, 1, 3,
+     4, 2, 3, 1,
+     1, 2, 2, 4,
+     3, 2, 1, 3),
+    (0, 0, 1, 2,
+     0, 2, 0, 0,
+     0, 3, 0, 0,
+     0, 1, 0, 0)
+)
+
+outcomes = (
+    ((1, 3, 4, 2),
+     (4, 2, 1, 3),
+     (3, 4, 2, 1),
+     (2, 1, 3, 4)),
+    ((2, 1, 4, 3),
+     (3, 4, 1, 2),
+     (4, 2, 3, 1),
+     (1, 3, 2, 4))
+)
+
+solve = solve_puzzle(clues[0])
+for key, cell in enumerate(solve):
+    print(cell)
 
 
 class Node:
@@ -36,6 +75,7 @@ tree.right = Node(None, None, 3)
 tree.left.left = Node(None, None, 4)
 tree.left.right = Node(None, None, 5)
 
+
 # print(pre_order(tree))
 
 
@@ -50,11 +90,12 @@ def level_order(node):
             if tmp.right:
                 res.append(tmp.right)
 
-def tree_by_levels(node: Node):
 
+def tree_by_levels(node: Node):
     if not node:
         return []
     return [x for x in level_order(node)]
+
 
 # print(tree_by_levels(None))
 
@@ -82,11 +123,12 @@ def queue_time(customers, n):
             min_time = min(window)
             res.append(min_time)
             for _ in range(window.count(min_time)): window.remove(min_time)
-            window = [x-min_time for x in window]
+            window = [x - min_time for x in window]
         left = right
         right = n - len(window) + left
     print(res)
     return sum(res)
+
 
 # must be 101
 # print(queue_time([41, 21, 28, 29, 8, 37, 13, 2, 40, 37, 37, 11, 24, 36, 14, 45, 33, 40], 6))
