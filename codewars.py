@@ -5,19 +5,19 @@ N = 4
 
 
 def fill_base_constraint(number, puzzle):
-    constraint = puzzle[(0, number)]
+    constraint = puzzle[0][number]
     for i in range(1, N + 1):
         if constraint == N:
-            puzzle[(i, number)] = puzzle[(i, number)].append(str(i)) if puzzle.get((i, number), False) else [str(i)]
+            puzzle[i][number] = (puzzle[i][number], str(i)) if puzzle[i][number] else i
         if constraint == 1:
-            puzzle[1][number] = puzzle[(1, number)].append(str(N)) if puzzle.get((1, number), False) else [str(N)]
+            puzzle[1][number] = str(N)
 
 
 def solve_puzzle(clues):
-    puzzle = {(i, j): None for i in range(N + 3) for j in range(N + 3)}
+    puzzle = np.zeros((N + 2, N + 2), tuple)
     for _ in range(4):
         for j in range(1, N + 1):
-            puzzle[(0, j)] = clues[_ + j - 1 + (N - 1) * _]
+            puzzle[0][j] = clues[_ + j - 1 + (N - 1) * _]
             fill_base_constraint(j, puzzle)
         puzzle = np.rot90(puzzle)
 
@@ -47,8 +47,8 @@ outcomes = (
 )
 
 solve = solve_puzzle(clues[0])
-for key, cell in enumerate(solve):
-    print(cell)
+for _, row in enumerate(solve):
+    print(*row)
 
 
 class Node:
