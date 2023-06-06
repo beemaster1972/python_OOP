@@ -1,7 +1,8 @@
 # 4 By 4 Skyscrapers
-from typing import Sized
 
 import numpy as np
+
+from sudoku import *
 
 N = 4
 
@@ -27,9 +28,9 @@ def solve_puzzle(clues):
 
 
 clues = (
-    (4, 2, 1, 3,
-     4, 2, 3, 1,
-     1, 2, 2, 4,
+    (2, 2, 1, 3,
+     2, 2, 3, 1,
+     1, 2, 2, 3,
      3, 2, 1, 3),
     (0, 0, 1, 2,
      0, 2, 0, 0,
@@ -49,8 +50,6 @@ outcomes = (
 )
 
 solve = solve_puzzle(clues[0])
-max_length = max(solve, key=len)
-print(max_length)
 for _, row in enumerate(solve):
     print(*row)
 
