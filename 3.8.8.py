@@ -51,7 +51,16 @@ class TicTacToe:
 
     def __getitem__(self, item):
         item, is_int = self.__check_index(item)
-        return self.pole[item[0]][item[1]].value if is_int else tuple(row.value for row in self.pole[item[0]][item[1]])
+        if not is_int:
+            res = []
+
+            row_range = range(item[0], item[0]+1) if isinstance(item[0], int) else range(*item[0].indices(self.__N))
+            col_range = range(item[1], item[1]+1) if isinstance(item[1], int) else range(*item[1].indices(self.__N))
+            for _ in row_range:
+                for __ in col_range:
+                    res.append(self.pole[_][__].value)
+
+        return self.pole[item[0]][item[1]].value if is_int else tuple(res)
 
     def __setitem__(self, key, value):
         key, is_int = self.__check_index(key)
