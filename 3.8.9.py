@@ -33,6 +33,9 @@ class Thing:
         if isinstance(next, Thing) or next is None:
             self.__next = next
 
+    def __repr__(self):
+        return f'Thing: {self.name} вес: {self.weight} --> {self.next.name if self.next else "None"}'
+
 
 class Bag:
     __slots__ = ('__max_weight', 'head', 'tail', '__weight')
@@ -45,6 +48,7 @@ class Bag:
     @property
     def weight(self):
         return self.__weight
+
     @property
     def max_weight(self):
         return self.__max_weight
@@ -61,35 +65,53 @@ class Bag:
             self.__weight += thing.weight
 
     def __get_by_index(self, idx: int):
-        cur = prev = self.head
+        cur = self.head
+        prev = None
         cnt = 0
         while cnt < idx:
             prev = cur
             if cur.next:
                 cur = cur.next
+            else:
+                break
             cnt += 1
-        if cnt > idx:
+        if cnt != idx:
             raise IndexError(f"Неправильный индекс {idx}")
-        return cur, prev if cnt == idx else False
+        return cur, prev
 
     def __getitem__(self, item):
         things = self.__get_by_index(item)
-        if things:
-            return things[0]
+        return things[0]
 
     def __setitem__(self, key, value):
         things = self.__get_by_index(key)
-        if things and isinstance(value, Thing):
-            self.__weight -= things[0].weight
+        if isinstance(value, Thing):
+            cur, prev = things
+            if self.weight + value.weight - cur.weight > self.max_weight:
+                raise ValueError('превышен суммарный вес предметов')
+            if prev:
+                prev.next = value
+            else:
+                self.head = value
+            if not cur.next:
+                self.tail = value
+            self.__weight -= cur.weight
             self.__weight += value.weight
-            things[1].next = value
-            value.next = things[0].next
+            value.next = cur.next
 
     def __delitem__(self, key):
         things = self.__get_by_index(key)
-        if things:
-            things[1].next = things[0].next
-            self.__weight -= things[0].weight
+        cur, prev = things
+        if prev:
+            prev.next = cur.next
+        else:
+            self.head = cur.next
+        if not cur.next:
+            self.tail = prev
+        self.__weight -= cur.weight
+
+    def __repr__(self):
+        return f"Bag: {self.weight} из {self.max_weight}"
 
 
 if __name__ == '__main__':
@@ -135,3 +157,5 @@ if __name__ == '__main__':
         assert True
     else:
         assert False, "не сгенерировалось исключение ValueError при замене предмета в объекте класса Bag по индексу"
+
+    print("Всё отлично!!")
