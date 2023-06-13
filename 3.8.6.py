@@ -30,8 +30,7 @@ class StackObj:
 class Stack:
 
     def __init__(self):
-        self.top = None
-        self.tail = None
+        self.top = self.tail = None
         self.__length = 0
 
     def push(self, obj):

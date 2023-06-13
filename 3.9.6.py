@@ -20,16 +20,20 @@ class TriangleListIterator:
 
     def __init__(self, lst):
         self.lst = lst
-        self._index = -1
+        self._index = -1 # индекс для прохода по строкам
+        self._j = -1  # второй индекс для прохода по колонкам
 
     def __iter__(self):
         self._index = -1
         return self
 
     def __next__(self):
+        #        if self._j == self._index:
         self._index += 1
         if self._index < len(self.lst):
-            return IterTriangle(self.lst[self._index], self._index)
+            for _ in range(self._index + 1):
+                yield self.lst[self._index][_]
+
         raise StopIteration
 
 
@@ -42,7 +46,5 @@ if __name__ == '__main__':
         print()
     tr = TriangleListIterator(lst)
     print('Triangle list')
-    for row in tr:
-        for el in row:
-            print(el, end=' ')
-        print()
+    for el in tr:
+        print(el, end=' ')
