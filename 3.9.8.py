@@ -9,11 +9,14 @@ class StackObj:
         return self._next
 
     @next.setter
-    def next(self, next: StackObj):
+    def next(self, next):
         if isinstance(next, StackObj) or next is None:
             self._next = next
         else:
             raise TypeError("Ссылка дложна быть StackObj")
+
+    def __repr__(self):
+        return f'StackObj({self.data})'
 
 
 class Stack:
@@ -32,7 +35,8 @@ class Stack:
     def __len__(self):
         return self._length
 
-    def __check_obj(self, obj):
+    @staticmethod
+    def __check_obj(obj):
         if isinstance(obj, StackObj):
             return obj
         else:
@@ -40,8 +44,14 @@ class Stack:
 
     def push_back(self, obj: StackObj):
         obj = self.__check_obj(obj)
-        last = self[len(self) - 1]
-        last.next = obj
+        if not self.top:
+            self.top = obj
+        else:
+            it = iter(self)
+            last = next(it)
+            while last.next:
+                last = next(it)
+            last.next = obj
         self._length += 1
 
     def push_front(self, obj: StackObj):
@@ -69,7 +79,45 @@ class Stack:
 
     def __getitem__(self, item):
         self.__check_index(item)
-        cnt, obj, it = 0, none, iter(self)
+        cnt, it = 0, iter(self)
+        obj = next(it)
 
         while cnt < item:
-            
+            obj = next(it)
+            cnt += 1
+        return obj.data
+
+    def __setitem__(self, key, value):
+        self.__check_index(key)
+        cnt, it = 0, iter(self)
+        obj = next(it)
+
+        while cnt < key:
+            obj = next(it)
+            cnt += 1
+        obj.data = value
+
+
+if __name__ == '__main__':
+    st = Stack()
+    st.push_back(StackObj("1"))
+    st.push_front(StackObj("2"))
+    res1, res2 = st[0], st[1]
+    assert st[0] == "2" and st[1] == "1", "неверные значения данных из объектов стека, при обращении к ним по индексу"
+
+    st[0] = "0"
+    assert st[0] == "0", "получено неверное значение из объекта стека, возможно, некорректно работает присваивание нового значения объекту стека"
+
+    for obj in st:
+        assert isinstance(obj, StackObj), "при переборе стека через цикл должны возвращаться объекты класса StackObj"
+
+    try:
+        a = st[3]
+    except IndexError:
+        assert True
+    else:
+        assert False, "не сгенерировалось исключение IndexError"
+
+    st.push_back("3")
+    for el in st:
+        print(el.data)
