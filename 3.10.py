@@ -33,14 +33,18 @@ class Cell:
 
 
 class TicTacToe:
-    __slots__ = 'pole', '__N'
+    __slots__ = 'pole', '__N'  # , 'FREE_CELL', 'HUMAN_X', 'COMPUTER_0'
+    FREE_CELL = 0  # свободная клетка
+    HUMAN_X = 1  # крестик (игрок - человек)
+    COMPUTER_O = 2  # нолик (игрок - компьютер)
 
     def __init__(self, dimension=3):
         self.__N = dimension
-        self.pole = tuple(tuple(Cell() for _ in range(self.__N)) for __ in range(self.__N))
+        self.pole = ()
+        self.init()
 
-    def clear(self):
-        self.__init__(self.__N)
+    def init(self):
+        self.pole = tuple(tuple(Cell() for _ in range(self.__N)) for __ in range(self.__N))
 
     def __check_index(self, item):
         if not isinstance(item, tuple) or \
@@ -54,8 +58,8 @@ class TicTacToe:
         if not is_int:
             res = []
 
-            row_range = range(item[0], item[0]+1) if isinstance(item[0], int) else range(*item[0].indices(self.__N))
-            col_range = range(item[1], item[1]+1) if isinstance(item[1], int) else range(*item[1].indices(self.__N))
+            row_range = range(item[0], item[0] + 1) if isinstance(item[0], int) else range(*item[0].indices(self.__N))
+            col_range = range(item[1], item[1] + 1) if isinstance(item[1], int) else range(*item[1].indices(self.__N))
             for _ in row_range:
                 for __ in col_range:
                     res.append(self.pole[_][__].value)
