@@ -48,7 +48,8 @@ class Matrix:
 
     def __add__(self, other):
         other = self.__get_other(other)
-        return Matrix([[self[(i, j)] + other[(i, j)] for j in range(self.__coords[1])] for i in range(self.__coords[0])])
+        return Matrix(
+            [[self[(i, j)] + other[(i, j)] for j in range(self.__coords[1])] for i in range(self.__coords[0])])
 
     def __radd__(self, other):
         return self + other

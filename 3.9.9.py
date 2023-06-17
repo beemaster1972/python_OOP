@@ -14,11 +14,11 @@ class Cell:
     def __repr__(self):
         return f'{self.data}'
 
+
 class IterTable:
 
     def __init__(self, row):
         self.__row = row
-
 
     def __iter__(self):
         for _, el in enumerate(self.__row):
@@ -26,6 +26,7 @@ class IterTable:
 
     def __repr__(self):
         return f'IterTable({self.__row})'
+
 
 class TableValues:
 
@@ -75,6 +76,7 @@ class TableValues:
 
     def __repr__(self):
         return f'TableValues({self.coords[0]},{self.coords[1]}, {self.type_data})'
+
 
 if __name__ == '__main__':
     tb = TableValues(3, 2)
