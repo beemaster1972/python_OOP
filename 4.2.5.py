@@ -5,6 +5,9 @@ class Protists:
         self.weight = weight
         self.old = old
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.name}, {self.weight}, {self.old})'
+
 
 class Plants(Protists):
     pass
@@ -63,4 +66,14 @@ if __name__ == '__main__':
                       'Flower, "Роза", 0.1, 2',
                       'Worm, "червь", 0.01, 1',
                       'Worm, "червь 2", 0.02, 1')
-    
+    lst_objs = []
+    for obj in objects_string:
+        s = obj.split(",")
+        lst_objs.append(eval(f'{s[0]}({s[1]}, {float(s[2])}, {int(s[3])})'))
+    lst_animals = [obj for obj in lst_objs if isinstance(obj, Animals)]
+    lst_plants = [obj for obj in lst_objs if isinstance(obj, Plants)]
+    lst_mammals = [obj for obj in lst_objs if isinstance(obj, Mammals)]
+    print(lst_objs)
+    print(lst_animals)
+    print(lst_mammals)
+    print(lst_plants)
