@@ -1,5 +1,12 @@
-def integer_params_decorated():
-    pass
+def integer_params_decorated(method):
+    def wrapper(*args, **kwargs):
+        conditions = [isinstance(v, int) for i, v in enumerate(args) if i > 0]
+        conditions.extend([isinstance(v, int) for v in kwargs.values()])
+        if not all(conditions):
+            raise TypeError("аргументы должны быть целыми числами")
+        return method(*args, **kwargs)
+
+    return wrapper
 
 
 def integer_params(cls):
@@ -24,3 +31,11 @@ class Vector:
     def set_coords(self, *coords, reverse=False):
         c = list(coords)
         self.__coords = c if not reverse else c[::-1]
+
+
+v = Vector(1,2,3,4)
+print(v[1])
+v[3] = 5
+print(v[3])
+v['a'] = '1'
+v1 = Vector(2.3)
