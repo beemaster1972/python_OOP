@@ -42,7 +42,7 @@ while v != -1:          # цикл, пока не просмотрим все в
 #print(T, M, sep="\n")
 
 # формирование оптимального маршрута:
-start = 0
+start = 3
 end = 4
 P = [end]
 while end != start:

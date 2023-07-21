@@ -1,5 +1,5 @@
-import numpy as np
 import math
+
 
 class Vertex:
     __slots__ = ("_links", "_id")
@@ -9,6 +9,10 @@ class Vertex:
         self._links = []
         Vertex.ID += 1
         self._id = Vertex.ID
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def links(self):
@@ -63,7 +67,6 @@ class LinkedGraph:
     def __init__(self):
         self._links = {}
         self._vertex = []
-        self._adjacency_matrix = None
 
     @property
     def vertex(self):
@@ -89,25 +92,41 @@ class LinkedGraph:
         return self._links.get(hash(hash(v1) + hash(v2)), None)
 
     def find_path(self, start_v, stop_v):
-        if not self._adjacency_matrix:
-            self._adjacency_matrix = AdjacencyMatrix(self)
+        find_path_res = DijkstraAlgorithm(self)
+        return find_path_res(start_v, stop_v)
 
 
 class AdjacencyMatrix:
 
     def __init__(self, graph: LinkedGraph):
         N = len(graph.vertex)
-        self._adj_matrix = np.zeros((N, N))
+        self._adj_matrix = [[math.inf if i != j else 0 for j in range(N)] for i in range(N)]
         for l in graph.links:
-            self._adj_matrix[l.v1._id][l.v2._id] = l.dist
-            self._adj_matrix[l.v2._id][l.v1._id] = l.dist
+            self._adj_matrix[l.v1.id][l.v2.id] = l.dist
+            self._adj_matrix[l.v2.id][l.v1.id] = l.dist
         for i, row in enumerate(self._adj_matrix):
             for j, col in enumerate(row):
                 if j == i:
                     continue
                 if not col:
                     self._adj_matrix[i][j] = math.inf
-        print(self._adj_matrix)
+        print(self)
+
+    def __str__(self):
+        return "\n".join([str(row) for row in self._adj_matrix])
+
+
+class DijkstraAlgorithm:
+
+    def __init__(self, graph: LinkedGraph):
+        self.graph = graph
+        self.adjacency_matrix = AdjacencyMatrix(self.graph)
+
+    def find_path(self, start_v: Vertex, stop_v: Vertex):
+        pass
+
+    def __call__(self, start_v: Vertex, stop_v: Vertex):
+        return self.find_path(start_v, stop_v)
 
 
 if __name__ == '__main__':
