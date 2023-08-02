@@ -1,3 +1,6 @@
 .idea
 tests
 venv
+/MagicMethods/
+__pycache__
+gorod(почти готовая)
