@@ -149,6 +149,7 @@ class GamePole:
         self._ships = {}
         self.__validator = Validator(size)
         self._pole = None
+        self.turns = [[0] * self._size for _ in range(self._size)]
 
     def init(self):
         """Корабли формируются в коллекции _ships следующим образом:
@@ -157,13 +158,13 @@ class GamePole:
         трехпалубных - 2;
         четырехпалубный - 1"""
         # Пополняем флот согласно расписания
-        _ships = []
+        _ships_array = []
         for number_of_decks, number_of_ships in self.COMPOSITION_OF_THE_FLEET.items():
             ships_temp = [Ship(number_of_decks, randint(1, 2), validator=self.__validator) for _ in
                           range(number_of_ships)]
-            _ships += ships_temp
+            _ships_array += ships_temp
         count = []  # Кэш для использованных координат
-        for i, ship in enumerate(_ships):
+        for i, ship in enumerate(_ships_array):
             with ShipDefender(ship) as s:
                 while True and len(count) <= self._size * self._size:
                     try:
@@ -178,12 +179,12 @@ class GamePole:
                         count.append((x, y))
                     except ValueError:
                         pass
-                    fl = [_ships[_].is_collide(s) for _ in range(i)]
+                    fl = [_ships_array[_].is_collide(s) for _ in range(i)]
                     if not fl or (not any(fl) and not s.is_out_pole(self._size)):
                         break
                 if len(count) == self._size * self._size:
                     raise Exception(f"Все варианты проверены, нет возможности разместить {s}")
-        self._ships = {(s.x, s.y): s for s in _ships}
+        self._ships = {s: (s.x, s.y) for s in _ships_array}
         self._pole = self.get_pole()
 
     def __fill_ship(self, ship):
@@ -198,18 +199,28 @@ class GamePole:
             print()
 
     def show_human(self):
+        print(" |", *[f'{_:^2}' for _ in range(self.__validator.size)], end='    ')
         print(" |", *[f'{_:^2}' for _ in range(self.__validator.size)])
-        print('-' * self.__validator.size * 3)
-        for _, row in enumerate(self._pole):
+        print('-' * self._size * 3+'-', end='      ')
+        print('-' * self._size * 3+'-')
+        temp_pole = [tuple(zip(self._pole[_], self.turns[_])) for _ in range(self._size)]
+        for _, row in enumerate(temp_pole):
             print(f'{_}|', end='')
             for el in row:
-                ch = el if el else " "
+                ch = el[0] if el[0] else " "
                 print(f'{ch:^3}', end='')
+
+            print('    ' + f'{_}|', end='')
+            for el in row:
+                ch = el[1] if el[1] else " "
+                ch = ch if el[1] >= 0 else "X"
+                print(f'{ch:^3}', end='')
+
             print()
 
     def get_ships(self):
         """возвращает коллекцию _ships"""
-        return [sh for sh in self._ships.values()]
+        return [sh for sh in self._ships]
 
     def move_ships(self):
         """перемещает каждый корабль из коллекции _ships на одну клетку
@@ -217,35 +228,37 @@ class GamePole:
         если перемещение в выбранную сторону невозможно (другой корабль или пределы игрового поля),
         то попытаться переместиться в противоположную сторону,
         иначе (если перемещения невозможны), оставаться на месте"""
-        for ship in self._ships.values():
+        for ship in self._ships:
             with ShipDefender(ship) as s:
                 try:
                     go = choice([-1, 1])
                     s.move(go)
-                    collides = [sh.is_collide(s) for sh in self._ships.values()]
+                    collides = [sh.is_collide(s) for sh in self._ships]
                     if any(collides) or s.is_out_pole(self._size):
                         raise ValueError
                 except ValueError:
                     try:
                         go *= -1
                         s.move(go)
-                        collides = [sh.is_collide(s) for sh in self._ships.values()]
+                        collides = [sh.is_collide(s) for sh in self._ships]
                         if any(collides) or s.is_out_pole(self._size):
                             raise ValueError
                     except ValueError:
                         pass
+            self._ships[ship] = ship.x, ship.y
         self._pole = self.get_pole()
 
     def get_pole(self):
         self._pole = [[0] * self._size for _ in range(self._size)]
-        for s in self._ships.values():
+        for s in self._ships:
             self.__fill_ship(s)
         return tuple(tuple(row) for row in self._pole)
 
     def get_ship_on_coords(self, x, y) -> Ship:
-        for coords in self._ships:
-            if x in coords or y in coords:
-                return self._ships[coords]
+        for ship, coords in self._ships.items():
+            if (coords[0] <= x < ship.length + coords[0] and ship.tp == 1 and y == coords[1]) or (
+                    coords[1] <= y < coords[1] + ship.length and ship.tp == 2 and x == coords[0]):
+                return ship
         return None
 
     def check_turn(self, x, y):
@@ -254,10 +267,12 @@ class GamePole:
             ship = self.get_ship_on_coords(x, y)
             deck = x - ship.x if ship.tp == 1 else y - ship.y
             ship.hurt(deck)
-
+            if sum(ship.cells) == ship.length * 2:
+                return 2
+            return 1
         else:
             self.move_ships()
-            return False
+            return 0
 
 
 class SeaBattle:
@@ -266,23 +281,82 @@ class SeaBattle:
         self.human = GamePole(size)
         self.computer = GamePole(size)
         self.size = size
-        self.computer_turns = {}
+        self.computer_turns = [(x, y) for x in range(self.size) for y in range(self.size)]
+        self.human_turns = [(x, y) for x in range(self.size) for y in range(self.size)]
 
-    def computer_turn(self):
-        x_lim = self.size - 1
-        y_lim = self.size - 1
-        x, y = randint(0, x_lim), randint(0, y_lim)
-        while (x, y) in self.computer_turns:
-            x, y = randint(0, x_lim), randint(0, y_lim)
-        self.computer_turns[(x, y)] = 1
-        self.human.check_turn(x, y)
+    def computer_turn(self, x=None, y=None):
+        if x == self.size or y == self.size:
+            return
+
+        if x is None or (x, y) not in self.computer_turns:
+            x, y = choice(self.computer_turns)
+
+        if self.human.check_turn(x, y) == 1:
+            del self.computer_turns[self.computer_turns.index((x, y))]
+            self.computer_turn(min(self.size - 1, x + 1), y)
+        else:
+            del self.computer_turns[self.computer_turns.index((x, y))]
+
+    def __human_auto(self, x=None, y=None):
+        if x == self.size or y == self.size:
+            return
+
+        if x is None or (x, y) not in self.human_turns:
+            x, y = choice(self.human_turns)
+
+        if self.computer.check_turn(x, y) == 1:
+            del self.human_turns[self.human_turns.index((x, y))]
+            self.__human_auto(min(self.size - 1, x + 1), y)
+        else:
+            del self.human_turns[self.human_turns.index((x, y))]
+
+    def human_turn(self, auto=False):
+        if auto:
+            self.__human_auto()
+            return
+        count = 0
+        x = y = None
+        prompt = 'Введите координаты выстрела x y (целые числа через пробел) :'
+        while True and count < 10:
+            coords = input(prompt).split()
+            try:
+                x, y = map(int, coords)
+            except Exception as e:
+                count += 1
+                if count == 5:
+                    prompt = 'Для альтернативно одарённых повторяю:\n' + prompt
+                if count == 9:
+                    prompt = 'У тебя осталась ОДНА попытка!!! Если просрёшь и её, то компьютер победит\n' + \
+                             prompt.split('\n')[1]
+            else:
+                break
+            if count == 10:
+                while game.computer_turns:
+                    game.computer_turn()
+                return
+        self.human.turns[x][y] = self.computer.check_turn(x, y)
+        if self.human.turns[x][y]:
+            message = 'Попал' if self.human.turns[x][y] == 1 else 'УБИЛ!!!'
+            print(message)
+            self.human_turn()
+        else:
+            self.human.turns[x][y] = -1
+            return 0
 
     def get_victory(self):
         human_ships = self.human.get_ships()
         sum_human = sum([s.get_health() for s in human_ships]) / len(human_ships)
         comp_ships = self.computer.get_ships()
         sum_comp = sum([s.get_health() for s in comp_ships]) / len(comp_ships)
-        return sum_comp,sum_human
+        victory = int(sum_comp - sum_human)
+        if victory == -1:
+            comment = 'Компьютер'
+        elif victory == 1:
+            comment = 'Человек'
+        else:
+            comment = 'Идёт битва титанов'
+
+        return victory, comment
 
 
 if __name__ == '__main__':
@@ -290,14 +364,16 @@ if __name__ == '__main__':
     game = SeaBattle(10)
     game.human.init()
     game.computer.init()
-    comp, hum = game.get_victory()
-    print(comp, hum)
-    for _ in range(100):
+    victory, comment = game.get_victory()
+    while not victory:
+        game.human.show_human()
+        game.human_turn()
         game.computer_turn()
-    comp, hum = game.get_victory()
-    print(comp, hum)
+        game.computer.show_human()
     game.human.show_human()
-    print(game.computer_turns)
+    comp, hum = game.get_victory()
+    print(f'{"Победил " if abs(comp) == 1 else hum} {hum if abs(comp) == 1 else ""}')
+
     # sh = Ship(2, 2, 5, 0)
     # sh1 = Ship(1,1,6,0)
     # print(sh.is_collide(sh1))
