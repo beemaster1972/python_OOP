@@ -135,8 +135,6 @@ class Ship:
         return sum(self._cells) / self.length
 
     def __str__(self):
-        # st = '' if self._tp == 1 else '\n'
-        # return st.join(map(str, self._cells))
         return f'Ship(x={self.x},y={self.y}, {self.length}, {"ГОР" if self._tp == 1 else "ВЕР"})'
 
     def __repr__(self):
@@ -281,16 +279,25 @@ class SeaBattle:
 
     def get_victory(self):
         human_ships = self.human.get_ships()
-        sum_human = sum([s.get_health for s in human_ships])
+        sum_human = sum([s.get_health() for s in human_ships]) / len(human_ships)
+        comp_ships = self.computer.get_ships()
+        sum_comp = sum([s.get_health() for s in comp_ships]) / len(comp_ships)
+        return sum_comp,sum_human
+
 
 if __name__ == '__main__':
     seed(20)
-    gp = GamePole(10)
-    gp.init()
-    gp.show_human()
-    gp.move_ships()
-    print('After moves:')
-    gp.show_human()
+    game = SeaBattle(10)
+    game.human.init()
+    game.computer.init()
+    comp, hum = game.get_victory()
+    print(comp, hum)
+    for _ in range(100):
+        game.computer_turn()
+    comp, hum = game.get_victory()
+    print(comp, hum)
+    game.human.show_human()
+    print(game.computer_turns)
     # sh = Ship(2, 2, 5, 0)
     # sh1 = Ship(1,1,6,0)
     # print(sh.is_collide(sh1))
