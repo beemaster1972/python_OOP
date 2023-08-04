@@ -1,4 +1,4 @@
-from random import choice, shuffle
+from random import choice, shuffle, seed
 
 import numpy as np
 
@@ -25,8 +25,9 @@ class Validator:
     def size(self):
         return self.__max_value
 
-    def __validate(self, value, size=10):
-        return type(value) is int and 0 <= value <= (self.size if self.size == size else size)
+    def __validate(self, value, size=None, length=0):
+        specified_length = self.size if size is None else size
+        return type(value) is int and 0 <= value <= specified_length and value + length <= specified_length
 
     def __call__(self, *args, **kwargs):
         return self.__validate(*args, **kwargs)
@@ -61,7 +62,8 @@ class Ship:
 
     @x.setter
     def x(self, value):
-        if value is None or self.__validator(value):
+        length = self.length if self.tp == 1 else 0
+        if value is None or self.__validator(value, length=length):
             self._x = value
         else:
             raise ValueError(f'Ошибочная координата x = {value}')
@@ -72,14 +74,15 @@ class Ship:
 
     @y.setter
     def y(self, value):
-        if value is None or self.__validator(value):
+        length = self.length if self.tp == 2 else 0
+        if value is None or self.__validator(value, length=length):
             self._y = value
         else:
             raise ValueError(f'Ошибочная координата y = {self.y}')
 
-    @property
-    def cells(self):
-        return self._cells
+    # @property
+    # def cells(self):
+    #     return self._cells
 
     def set_start_coords(self, x, y):
         """- установка начальных координат (запись значений в локальные атрибуты _x, _y)"""
@@ -117,14 +120,15 @@ class Ship:
             return True
         return False
 
-    def is_out_pole(self, size=10):
+    def is_out_pole(self, size=None):
         """- проверка на выход корабля за пределы игрового поля
         (size - размер игрового поля, обычно, size = 10);
         возвращается булево значение True, если корабль вышел из игрового поля и False - в противном случае;"""
         if self.x is None or self.y is None:
             return False
-        condition = [not self.__validator(self.x + (self.length if self._tp == 1 else 0), size),
-                     not self.__validator(self.y + (self.length if self._tp == 2 else 0), size)]
+        size = self.length if size is None else size
+        condition = [not self.__validator(self.x + (self.length if self._tp == 1 else 0), size=size),
+                     not self.__validator(self.y + (self.length if self._tp == 2 else 0), size=size)]
         return any(condition)
 
     def hurt(self, deck):
@@ -134,7 +138,7 @@ class Ship:
                 self._is_move = False
 
     def get_health(self):
-        return sum(self.cells) / self.length
+        return sum(self._cells) / self.length
 
     def __str__(self):
         return f'Ship(x={self.x},y={self.y}, {self.length}, {"ГОР" if self._tp == 1 else "ВЕР"})'
@@ -143,7 +147,7 @@ class Ship:
         return f'Ship(x={self.x},y={self.y}, {self.length}, {"ГОР" if self._tp == 1 else "ВЕР"})'
 
     def __check_index(self, key):
-        if not (type(key) == int and 0 <= key < len(self.cells)):
+        if not (type(key) == int and 0 <= key < len(self._cells)):
             raise IndexError(f'Неверный индекс {key}')
         return key
 
@@ -180,7 +184,10 @@ class GamePole:
                    range(max(0, ship.y - 1), min(self._size, ship.y + ship.length + 1 if ship.tp == 2 else ship.y + 2))]
         for x in x_range:
             for y in y_range:
-                del self._ships_coords[self._ships_coords.index((x, y))]
+                try:
+                    del self._ships_coords[self._ships_coords.index((x, y))]
+                except ValueError as e:
+                    pass
 
     def init(self):
         """Корабли формируются в коллекции _ships следующим образом:
@@ -204,11 +211,15 @@ class GamePole:
 
                 except ValueError:
                     pass
-                finally:
-                    self.__delete_coords(s)
-                fl = [_ships_array[_].is_collide(s) for _ in range(i)]
-                if not fl or (not any(fl) and not s.is_out_pole(self._size)):
+
+                l = len(_ships_array) - 1
+                fl = [_ships_array[_].is_collide(s) for _ in range(l, l - i, -1)]
+                # Если нет ни одной коллизии с другими кораблями и координаты присвоены,
+                # то выходим из цикла
+                if not any(fl) and ship.x is not None and ship.y is not None:
+                    self.__delete_coords(ship)
                     break
+                # На всякий случай проверяем что больше нет доступных координат для размещения кораблей
                 if not len(self._ships_coords):
                     raise Exception(f"Все варианты проверены, нет возможности разместить {s}")
         self._ships = {s: (s.x, s.y) for s in _ships_array}
@@ -216,8 +227,11 @@ class GamePole:
 
     def __fill_ship(self, ship):
         for j in range(ship.length):
-            self._pole[ship.y if ship.tp == 1 else ship.y + j][ship.x if ship.tp == 2 else ship.x + j] = \
-                ship.cells[j]
+            try:
+                self._pole[ship.y if ship.tp == 1 else ship.y + j][ship.x if ship.tp == 2 else ship.x + j] = \
+                    ship[j]
+            except (TypeError, IndexError, ValueError):
+                pass
 
     def show(self):
         for _, row in enumerate(self._pole):
@@ -295,9 +309,7 @@ class GamePole:
             ship = self.get_ship_on_coords(x, y)
             deck = x - ship.x if ship.tp == 1 else y - ship.y
             ship.hurt(deck)
-            if sum(ship.cells) == ship.length * 2:
-                return 2
-            return 1
+            return int(ship.get_health())
         else:
             self.move_ships()
             return 0
@@ -386,9 +398,10 @@ class SeaBattle:
 
 def test():
     # seed(26)
+    validator = Validator(10)
     ship = Ship(2)
     ship = Ship(2, 1)
-    ship = Ship(3, 2, 0, 0)
+    ship = Ship(3, 2, 0, 0, validator=validator)
 
     assert ship._length == 3 and ship._tp == 2 and ship._x == 0 and ship._y == 0, "неверные значения атрибутов объекта класса Ship"
     assert ship._cells == [1, 1, 1], "неверный список _cells"
