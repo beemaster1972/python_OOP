@@ -1,4 +1,5 @@
-from random import randint, choice, seed
+from random import randint, choice, seed, shuffle
+import numpy as np
 
 
 class ShipDefender:
@@ -144,12 +145,17 @@ class Ship:
 class GamePole:
     COMPOSITION_OF_THE_FLEET = {1: 4, 2: 3, 3: 2, 4: 1}
 
-    def __init__(self, size):
+    def __init__(self, size, name ='COMPUTER'):
         self._size = size
         self._ships = {}
         self.__validator = Validator(size)
-        self._pole = None
-        self.turns = [[0] * self._size for _ in range(self._size)]
+        self._pole = np.array([[0] * self._size for _ in range(self._size)])
+        self.turns = np.array([[0] * self._size for _ in range(self._size)])
+        self.ships_coords = [(x, y) for x in range(self._size) for y in range(self._size)]
+        self.__name__ = name
+
+    def __repr__(self):
+        return f'{self.__name__}'
 
     def init(self):
         """Корабли формируются в коллекции _ships следующим образом:
@@ -160,36 +166,36 @@ class GamePole:
         # Пополняем флот согласно расписания
         _ships_array = []
         for number_of_decks, number_of_ships in self.COMPOSITION_OF_THE_FLEET.items():
-            ships_temp = [Ship(number_of_decks, randint(1, 2), validator=self.__validator) for _ in
+            ships_temp = [Ship(number_of_decks, choice([1, 2]), validator=self.__validator) for _ in
                           range(number_of_ships)]
             _ships_array += ships_temp
-        count = []  # Кэш для использованных координат
+        coords_cashe = []  # Кэш для использованных координат
         for i, ship in enumerate(_ships_array):
             with ShipDefender(ship) as s:
-                while True and len(count) <= self._size * self._size:
+                while True and len(coords_cashe) <= self._size * self._size:
                     try:
                         lim_x = self._size - 1 if s.tp == 2 else self._size - s.length  # Правый лимит для Х
                         lim_y = self._size - 1 if s.tp == 1 else self._size - s.length  # Правый лимит для Y
                         x, y = randint(0, lim_x), randint(0, lim_y)
-                        while (x, y) in count and len(count) <= (self._size * self._size) * 0.7:
+                        while (x, y) in coords_cashe and len(coords_cashe) <= (self._size * self._size) * 0.7:
                             # Коэффициент 0,7 подобран экспериментально, если взять больше, то возрастает вероятность
                             # безконечного цикла
                             x, y = randint(0, lim_x), randint(0, lim_y)
                         s.set_start_coords(x, y)
-                        count.append((x, y))
+                        coords_cashe.append((x, y))
                     except ValueError:
                         pass
                     fl = [_ships_array[_].is_collide(s) for _ in range(i)]
                     if not fl or (not any(fl) and not s.is_out_pole(self._size)):
                         break
-                if len(count) == self._size * self._size:
+                if len(coords_cashe) == self._size * self._size:
                     raise Exception(f"Все варианты проверены, нет возможности разместить {s}")
         self._ships = {s: (s.x, s.y) for s in _ships_array}
         self._pole = self.get_pole()
 
     def __fill_ship(self, ship):
         for j in range(ship.length):
-            self._pole[ship.x if ship.tp == 2 else ship.x + j][ship.y if ship.tp == 1 else ship.y + j] = \
+            self._pole[ship.y if ship.tp == 1 else ship.y + j][ship.x if ship.tp == 2 else ship.x + j] = \
                 ship.cells[j]
 
     def show(self):
@@ -278,7 +284,7 @@ class GamePole:
 class SeaBattle:
 
     def __init__(self, size):
-        self.human = GamePole(size)
+        self.human = GamePole(size, 'HUMAN')
         self.computer = GamePole(size)
         self.size = size
         self.computer_turns = [(x, y) for x in range(self.size) for y in range(self.size)]
@@ -334,13 +340,13 @@ class SeaBattle:
                 while game.computer_turns:
                     game.computer_turn()
                 return
-        self.human.turns[x][y] = self.computer.check_turn(x, y)
-        if self.human.turns[x][y]:
-            message = 'Попал' if self.human.turns[x][y] == 1 else 'УБИЛ!!!'
+        self.human.turns[y][x] = self.computer.check_turn(x, y)
+        if self.human.turns[y][x]:
+            message = 'Попал' if self.human.turns[y][x] == 1 else 'УБИЛ!!!'
             print(message)
             self.human_turn()
         else:
-            self.human.turns[x][y] = -1
+            self.human.turns[y][x] = -1
             return 0
 
     def get_victory(self):
@@ -365,10 +371,14 @@ if __name__ == '__main__':
     game.human.init()
     game.computer.init()
     victory, comment = game.get_victory()
+    print('COMPUTER')
+    game.computer.show_human()
     while not victory:
+        print('HUMAN')
         game.human.show_human()
         game.human_turn()
         game.computer_turn()
+        print('COMPUTER')
         game.computer.show_human()
     game.human.show_human()
     comp, hum = game.get_victory()
